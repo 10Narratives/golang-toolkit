@@ -1,0 +1,70 @@
+name: Check Docs & Publish
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  check-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+        id: go
+
+      - name: Install dependencies
+        run: |
+          go mod download
+          go install github.com/mgechev/revive@latest
+
+      - name: Run revive to check for missing comments
+        run: |
+          revive -config <(echo '
+          {
+            "rule": [
+              {
+                "name": "exported",
+                "severity": "error",
+                "arguments": ["-check-all"]
+              }
+            ]
+          }') ./...
+        env:
+          GOGC: 20
+
+      - name: Check with go vet
+        run: go vet -printfuncs=Log,Print ./...
+
+  publish-docs:
+    needs: check-docs
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Generate documentation with godoc
+        run: |
+          go install golang.org/x/tools/cmd/godoc@latest
+          mkdir -p public-docs
+          cp -r . public-docs/
+          echo "Documentation generated from source" > public-docs/index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: success()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public-docs
+          commit_message: ${{ github.event.head_commit.message }}
