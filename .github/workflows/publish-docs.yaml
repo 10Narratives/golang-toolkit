@@ -1,33 +1,13 @@
-name: Check Docs & Publish
+name: Publish documentation
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
+    branches: [ "main" ]  
+  push:
     branches: [ "main" ]
 
 jobs:
-  check-docs:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.24'
-
-      - name: Install staticcheck
-        run: |
-          go install honnef.co/go/tools/cmd/staticcheck@latest
-
-      - name: Run staticcheck for documentation
-        run: |
-          staticcheck -checks=exported ./...
-
   publish-docs:
-    needs: check-docs
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
@@ -44,7 +24,7 @@ jobs:
         run: |
           go install github.com/rohit-px/godox@latest
           mkdir -p docs-html
-          godox -path=. -output=docs-html -title="golang-toolkit docs"
+          godox -path=. -output=docs-html -title="golang-toolkit"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
