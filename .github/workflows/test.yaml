@@ -1,0 +1,52 @@
+name: Unit tests
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+
+      - name: Install dependencies
+        run: |
+          go mod download
+          go mod verify
+
+      - name: Run tests with coverage
+        run: |
+          go test -race -coverprofile=coverage.out -covermode=atomic ./...
+          go tool cover -func=coverage.out
+
+      - name: Check coverage threshold
+        env:
+          COVERAGE_THRESHOLD: ${{ vars.COVERAGE_THRESHOLD || '80.0' }}
+        run: |
+          if [ ! -f coverage.out ]; then
+            echo "❌ coverage.out not found. Tests may have failed."
+            exit 1
+          fi
+
+          TOTAL_COVERAGE=$(go tool cover -func=coverage.out | grep 'total:' | awk '{print $3}' | sed 's/%//')
+
+          COVERAGE=$(echo "$TOTAL_COVERAGE" | sed 's/%//')
+
+          THRESHOLD=$COVERAGE_THRESHOLD
+
+          echo "✅ Total test coverage: $COVERAGE%"
+          echo "📊 Required threshold: $THRESHOLD%"
+
+          if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
+            echo "❌ Test coverage is below $THRESHOLD% (current: $COVERAGE%)"
+            exit 1
+          else
+            echo "✅ Test coverage meets the requirement."
+          fi
