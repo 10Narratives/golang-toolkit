@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/10Narratives/golang-toolkit/pkg/logging/handlers/slogpretty"
+	"github.com/10Narratives/golang-toolkit/logging/handlers/slogpretty"
 	"github.com/fatih/color"
 	"github.com/stretchr/testify/assert"
 )
