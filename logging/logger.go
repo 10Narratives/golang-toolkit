@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/10Narratives/golang-toolkit/pkg/logging/handlers/slogdiscard"
-	"github.com/10Narratives/golang-toolkit/pkg/logging/handlers/slogpretty"
+	"github.com/10Narratives/golang-toolkit/logging/handlers/slogdiscard"
+	"github.com/10Narratives/golang-toolkit/logging/handlers/slogpretty"
 	"github.com/natefinch/lumberjack"
 )
 

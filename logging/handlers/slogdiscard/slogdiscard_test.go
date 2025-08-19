@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/10Narratives/golang-toolkit/pkg/logging/handlers/slogdiscard"
+	"github.com/10Narratives/golang-toolkit/logging/handlers/slogdiscard"
 	"github.com/stretchr/testify/assert"
 )
 
