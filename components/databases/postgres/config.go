@@ -1,4 +1,4 @@
-package pgapp
+package pgcomp
 
 type Config struct {
 	Host     string `yaml:"host" env-required:"true"`
