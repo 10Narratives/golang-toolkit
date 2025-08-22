@@ -1,4 +1,4 @@
-package pgapp
+package pgcomp
 
 import (
 	"context"
